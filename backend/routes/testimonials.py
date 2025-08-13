@@ -2,13 +2,13 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
 import logging
 
-from ..models import (
+from models import (
     SchoolTestimonial, 
     TestimonialCreate, 
     TestimonialsResponse, 
     APIResponse
 )
-from ..database import get_database
+from database import get_database
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/testimonials", tags=["testimonials"])
