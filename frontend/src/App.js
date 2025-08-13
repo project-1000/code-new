@@ -35,6 +35,7 @@ const Home = () => {
       <Testimonials />
       <Contact />
       <Footer />
+      <Toaster />
     </div>
   );
 };
