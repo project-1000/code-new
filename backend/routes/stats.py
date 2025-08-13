@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from datetime import datetime
 import logging
 
 from ..models import SchoolStats, StatsResponse
