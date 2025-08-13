@@ -1,6 +1,7 @@
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
+import ssl
 
 logger = logging.getLogger(__name__)
 
@@ -19,12 +20,26 @@ async def connect_to_mongo():
         if not mongo_url:
             raise ValueError("MONGO_URL environment variable is required")
         
-        client = AsyncIOMotorClient(mongo_url)
+        # Configure SSL context for MongoDB Atlas
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        
+        # Create client with SSL configuration
+        client = AsyncIOMotorClient(
+            mongo_url,
+            tls=True,
+            tlsAllowInvalidCertificates=True,
+            tlsAllowInvalidHostnames=True,
+            serverSelectionTimeoutMS=30000,
+            connectTimeoutMS=30000
+        )
+        
         database = client[db_name]
         
         # Test connection
         await client.admin.command('ping')
-        logger.info(f"Successfully connected to MongoDB: {db_name}")
+        logger.info(f"Successfully connected to MongoDB Atlas: {db_name}")
         
         return database
         
