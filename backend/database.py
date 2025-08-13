@@ -19,27 +19,18 @@ async def connect_to_mongo():
         if not mongo_url:
             raise ValueError("MONGO_URL environment variable is required")
         
-        # Create client with proper timeout settings for MongoDB Atlas
-        client = AsyncIOMotorClient(
-            mongo_url,
-            serverSelectionTimeoutMS=10000,
-            connectTimeoutMS=20000,
-            maxPoolSize=10
-        )
-        
+        client = AsyncIOMotorClient(mongo_url)
         database = client[db_name]
         
         # Test connection
         await client.admin.command('ping')
-        logger.info(f"Successfully connected to MongoDB Atlas: {db_name}")
+        logger.info(f"Successfully connected to MongoDB: {db_name}")
         
         return database
         
     except Exception as e:
         logger.error(f"Failed to connect to MongoDB: {str(e)}")
-        # For development, we'll continue without connection
-        logger.warning("Continuing without database connection for development")
-        return None
+        raise
 
 async def close_mongo_connection():
     """Close database connection"""
