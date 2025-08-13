@@ -140,7 +140,7 @@ class SchoolAPITester:
             "email": "sarah.johnson@brightfuture.edu",
             "message": "I'm interested in learning more about your school management system for our district.",
             "school": "Bright Future Elementary",
-            "phone": "+1-555-0123"
+            "phone": "+1-555-012-3456"
         }
         
         try:
