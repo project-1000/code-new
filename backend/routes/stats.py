@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException
 from datetime import datetime
 import logging
 
-from ..models import SchoolStats, StatsResponse
-from ..database import get_database
+from models import SchoolStats, StatsResponse
+from database import get_database
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/stats", tags=["statistics"])
