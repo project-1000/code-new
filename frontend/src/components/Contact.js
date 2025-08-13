@@ -5,6 +5,7 @@ import { Textarea } from './ui/textarea';
 import { Card } from './ui/card';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { contactsAPI } from '../services/api';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -14,17 +15,71 @@ const Contact = () => {
     phone: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Mock form submission
-    console.log('Form submitted:', formData);
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you within 24 hours.",
-    });
-    setFormData({ name: '', email: '', school: '', phone: '', message: '' });
+    
+    if (isSubmitting) return;
+    
+    // Basic validation
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      
+      // Submit to backend
+      const response = await contactsAPI.submitContact({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        school: formData.school.trim() || null,
+        phone: formData.phone.trim() || null,
+        message: formData.message.trim()
+      });
+
+      if (response.success) {
+        // Success - show toast and reset form
+        toast({
+          title: "Message Sent!",
+          description: response.message || "We'll get back to you within 24 hours.",
+        });
+        
+        // Reset form
+        setFormData({ 
+          name: '', 
+          email: '', 
+          school: '', 
+          phone: '', 
+          message: '' 
+        });
+      } else {
+        // API returned success: false
+        toast({
+          title: "Error",
+          description: response.message || "Failed to send message. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Contact form submission error:', error);
+      
+      // Show user-friendly error message
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send message. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -65,6 +120,7 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                     className="w-full"
+                    disabled={isSubmitting}
                   />
                 </div>
                 
@@ -79,6 +135,7 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                     className="w-full"
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -94,6 +151,7 @@ const Contact = () => {
                     value={formData.school}
                     onChange={handleChange}
                     className="w-full"
+                    disabled={isSubmitting}
                   />
                 </div>
                 
@@ -107,6 +165,7 @@ const Contact = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     className="w-full"
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -123,12 +182,26 @@ const Contact = () => {
                   rows={4}
                   className="w-full"
                   placeholder="Tell us about your school's needs..."
+                  disabled={isSubmitting}
                 />
               </div>
               
-              <Button type="submit" className="btn-primary w-full">
-                <Send size={16} className="mr-2" />
-                Send Message
+              <Button 
+                type="submit" 
+                className="btn-primary w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send size={16} className="mr-2" />
+                    Send Message
+                  </>
+                )}
               </Button>
             </form>
           </Card>
