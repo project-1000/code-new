@@ -3,14 +3,14 @@ from typing import List, Optional
 from datetime import datetime
 import logging
 
-from ..models import (
+from models import (
     ContactSubmission, 
     ContactSubmissionCreate, 
     ContactResponse, 
     APIResponse,
     ContactStatus
 )
-from ..database import get_database
+from database import get_database
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/contacts", tags=["contacts"])
